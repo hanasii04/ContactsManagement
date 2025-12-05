@@ -1,4 +1,5 @@
-using ContactsManagement.Models;
+﻿using ContactsManagement.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContactsManagement
@@ -15,6 +16,14 @@ namespace ContactsManagement
 			builder.Services.AddDbContext<AppDbContext>(options =>
 			options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+			builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+			.AddCookie(options =>
+			{
+				options.LoginPath = "/Auth/Login"; // Nếu chưa đăng nhập thì chuyển hướng về đây
+				options.ExpireTimeSpan = TimeSpan.FromDays(7); // Cookie sống trong 7 ngày
+				options.AccessDeniedPath = "/Auth/AccessDenied"; // Nếu không đủ quyền
+			});
+
 			var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -30,7 +39,8 @@ namespace ContactsManagement
 
             app.UseRouting();
 
-            app.UseAuthorization();
+			app.UseAuthentication();
+			app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
