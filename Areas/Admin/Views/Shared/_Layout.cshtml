@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"] - Contact Pro</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,600,700&display=fallback">
+    <link rel="stylesheet" href="~/adminlte/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/adminlte/dist/css/adminlte.min.css">
+
+    <style>
+        /* 1. NỀN TRANG: Màu xanh phấn nhẹ nhàng */
+        body, .content-wrapper {
+            background-color: #f3f8f7 !important; /* Màu nền xanh rất nhạt */
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        /* 2. SIDEBAR: Hiệu ứng kính mờ (Glassmorphism) */
+        .main-sidebar {
+            background-color: #ffffff !important; /* Nền trắng sạch */
+            box-shadow: 0 0 20px rgba(0,0,0,0.05) !important; /* Bóng mờ rất nhẹ */
+            border-right: none;
+        }
+
+        /* Logo */
+        .brand-link {
+            border-bottom: 1px solid #f0f0f0 !important;
+            background: transparent !important;
+        }
+
+        .brand-text {
+            color: #20c997 !important; /* Chữ Logo màu xanh Mint */
+            font-weight: 800 !important;
+            letter-spacing: 1px;
+        }
+
+        /* 3. HEADER (THANH TRÊN CÙNG): Trong suốt */
+        .main-header {
+            background-color: transparent !important;
+            border-bottom: none !important;
+            box-shadow: none !important;
+        }
+
+            .main-header .nav-link {
+                color: #6c757d !important; /* Màu chữ xám */
+                font-weight: 600;
+            }
+
+        /* 4. MENU ITEM: Bo tròn và đổi màu */
+        .nav-sidebar .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-sidebar .nav-link {
+            border-radius: 10px !important; /* Bo tròn nút */
+            color: #5a6268;
+            font-weight: 600;
+            padding: 10px 15px;
+            transition: all 0.3s;
+        }
+
+            /* Hover vào menu */
+            .nav-sidebar .nav-link:hover {
+                background-color: rgba(32, 201, 151, 0.1) !important; /* Nền xanh nhạt khi di chuột */
+                color: #087f5b !important;
+            }
+
+            /* MENU ĐANG CHỌN (ACTIVE) - ĐÂY LÀ ĐIỂM NHẤN */
+            .nav-sidebar .nav-link.active {
+                /* Gradient từ Xanh Mint sang Xanh Đậm */
+                background: linear-gradient(135deg, #20c997 0%, #087f5b 100%) !important;
+                color: #ffffff !important;
+                box-shadow: 0 5px 15px rgba(32, 201, 151, 0.4) !important; /* Bóng đổ xanh */
+                border: none;
+            }
+
+        /* Icon trong menu */
+        .nav-sidebar .nav-icon {
+            font-size: 1.1rem;
+            margin-right: 10px;
+        }
+
+        /* 5. CÁC WIDGET (HỘP THÔNG SỐ) */
+        .small-box {
+            border-radius: 20px !important;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border: none;
+            overflow: hidden;
+        }
+
+            .small-box .icon > i {
+                opacity: 0.3;
+            }
+
+        /* Màu Gradient cho các hộp */
+        .bg-info {
+            background: linear-gradient(135deg, #20c997 0%, #087f5b 100%) !important;
+        }
+
+        .bg-success {
+            background: linear-gradient(135deg, #4cd137 0%, #44bd32 100%) !important;
+        }
+
+        .bg-warning {
+            background: linear-gradient(135deg, #fbc531 0%, #e1b12c 100%) !important;
+            color: #fff !important;
+        }
+
+        .bg-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%) !important;
+        }
+
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+
+        <nav class="main-header navbar navbar-expand navbar-light">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="/" class="nav-link">Trang chủ User</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-danger" asp-area="" asp-controller="Auth" asp-action="Logout">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <aside class="main-sidebar sidebar-light-teal elevation-0">
+            <a href="#" class="brand-link">
+                <img src="~/adminlte/dist/img/AdminLTELogo.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text">CoachPro</span>
+            </a>
+
+            <div class="sidebar">
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex" style="border-bottom: 1px solid #f0f0f0;">
+                    <div class="image">
+                        <img src="~/adminlte/dist/img/user2-160x160.jpg" class="img-circle elevation-1" alt="User Image">
+                    </div>
+                    <div class="info">
+                        <a href="#" class="d-block font-weight-bold text-dark">Administrator</a>
+                    </div>
+                </div>
+
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+                               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                                <i class="nav-icon fas fa-th-large"></i>
+                                <p>Trang chủ</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-header text-uppercase font-weight-bold text-muted mt-3" style="font-size: 12px;">Quản lý</li>
+
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="UserManagement" asp-action="Index"
+                               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "UserManagement" ? "active" : "")">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Quản lý người dùng</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Contacts" asp-action="Index"
+                               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Contacts" ? "active" : "")">
+                                <i class="nav-icon fas fa-address-book"></i>
+                                <p>Quản lý liên hệ</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Categories" asp-action="Index"
+                               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Categories" ? "active" : "")">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>Quản lý danh mục</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-header text-uppercase font-weight-bold text-muted mt-3" style="font-size: 12px;">Hệ thống</li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-cog"></i>
+                                <p>Cài đặt</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 style="font-weight: 700; color: #343a40;">@ViewData["Title"]</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+            </section>
+        </div>
+
+        <footer class="main-footer" style="border-top: none; background: transparent;">
+            <div class="float-right d-none d-sm-block">
+                <b>Version</b> 1.0.0
+            </div>
+            <strong>Copyright &copy; 2025 <a href="#" style="color: #20c997;">MyContactApp</a>.</strong>
+        </footer>
+    </div>
+
+    <script src="~/adminlte/plugins/jquery/jquery.min.js"></script>
+    <script src="~/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/adminlte/dist/js/adminlte.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

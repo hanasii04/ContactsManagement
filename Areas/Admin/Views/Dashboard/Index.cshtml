@@ -1,0 +1,62 @@
+﻿@model ContactsManagement.Areas.Admin.Models.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>@Model.TotalUsers</h3>
+                <p>Tổng Người Dùng</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <a asp-controller="UserManagement" asp-action="Index" class="small-box-footer">
+                Chi tiết <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>@Model.TotalContacts</h3>
+                <p>Tổng Liên Hệ</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-address-book"></i>
+            </div>
+            <a asp-controller="ContactManagement" asp-action="Index" class="small-box-footer">
+                Chi tiết <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>@Model.NewUsersToday</h3>
+                <p>Đăng Ký Mới Hôm Nay</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>@Model.InactiveUsers</h3>
+                <p>Tài Khoản Bị Khóa</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-slash"></i>
+            </div>
+        </div>
+    </div>
+</div>
