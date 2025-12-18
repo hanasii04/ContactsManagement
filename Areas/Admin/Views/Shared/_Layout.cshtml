@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -123,7 +128,7 @@
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="/" class="nav-link">Trang chủ User</a>
+                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-link">Home</a>
                 </li>
             </ul>
 
@@ -135,7 +140,6 @@
                 </li>
             </ul>
         </nav>
-
         <aside class="main-sidebar sidebar-light-teal elevation-0">
             <a href="#" class="brand-link">
                 <img src="~/adminlte/dist/img/AdminLTELogo.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
@@ -157,7 +161,7 @@
 
                         <li class="nav-item">
                             <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
-                               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                               class="nav-link @(currentController == "Dashboard" ? "active" : "")">
                                 <i class="nav-icon fas fa-th-large"></i>
                                 <p>Trang chủ</p>
                             </a>
@@ -166,8 +170,8 @@
                         <li class="nav-header text-uppercase font-weight-bold text-muted mt-3" style="font-size: 12px;">Quản lý</li>
 
                         <li class="nav-item">
-                            <a asp-area="Admin" asp-controller="UserManagement" asp-action="Index"
-                               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "UserManagement" ? "active" : "")">
+                            <a asp-area="Admin" asp-controller="Users" asp-action="Index"
+                               class="nav-link @(currentController == "Users" ? "active" : "")">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>Quản lý người dùng</p>
                             </a>
@@ -175,17 +179,9 @@
 
                         <li class="nav-item">
                             <a asp-area="Admin" asp-controller="Contacts" asp-action="Index"
-                               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Contacts" ? "active" : "")">
+                               class="nav-link @(currentController == "Contacts" ? "active" : "")">
                                 <i class="nav-icon fas fa-address-book"></i>
                                 <p>Quản lý liên hệ</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a asp-area="Admin" asp-controller="Categories" asp-action="Index"
-                               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Categories" ? "active" : "")">
-                                <i class="nav-icon fas fa-tags"></i>
-                                <p>Quản lý danh mục</p>
                             </a>
                         </li>
 
@@ -220,7 +216,6 @@
                 </div>
             </section>
         </div>
-
         <footer class="main-footer" style="border-top: none; background: transparent;">
             <div class="float-right d-none d-sm-block">
                 <b>Version</b> 1.0.0
@@ -228,7 +223,6 @@
             <strong>Copyright &copy; 2025 <a href="#" style="color: #20c997;">MyContactApp</a>.</strong>
         </footer>
     </div>
-
     <script src="~/adminlte/plugins/jquery/jquery.min.js"></script>
     <script src="~/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/adminlte/dist/js/adminlte.min.js"></script>
