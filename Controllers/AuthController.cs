@@ -118,7 +118,7 @@ namespace ContactsManagement.Controllers
 				return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
 			}
 
-			return RedirectToAction("Index", "Home");
+			return RedirectToAction("Index", "Dashboard");
 		}
 
 		[HttpGet]
