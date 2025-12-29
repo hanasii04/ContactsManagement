@@ -1,0 +1,84 @@
+﻿@model ContactsManagement.DTOs.Categories.CategoriesDTO
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Cập nhật danh mục</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-action="Index">Danh mục</a></li>
+                    <li class="breadcrumb-item active">Cập nhật</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+
+                <div class="card card-warning shadow-sm">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-pen mr-1"></i> Chỉnh sửa thông tin
+                        </h3>
+                    </div>
+
+                    <form asp-action="Update" asp-route-id="@Context.Request.RouteValues["id"]" method="post">
+                        <div class="card-body">
+
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert" style="display:none">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Name" class="control-label">Tên danh mục <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    </div>
+                                    <input asp-for="Name" class="form-control" placeholder="Nhập tên mới..." autofocus />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger small mt-1"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-warning float-right">
+                                <i class="fas fa-save mr-1"></i> Cập nhật
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            if ($(".validation-summary-errors").length > 0) {
+                $(".alert-danger").show();
+            }
+        });
+    </script>
+}
