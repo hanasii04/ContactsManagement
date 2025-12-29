@@ -1,0 +1,82 @@
+﻿@model ContactsManagement.DTOs.Categories.CategoriesDTO
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Chi tiết danh mục</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-action="Index">Danh mục</a></li>
+                    <li class="breadcrumb-item active">Chi tiết</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card card-info shadow-sm">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle mr-1"></i> Thông tin: @Model.Name
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <dl class="row">
+                                    <dt class="col-sm-4">
+                                        Tên danh mục:
+                                    </dt>
+                                    <dd class="col-sm-8 text-lg font-weight-bold text-primary">
+                                        @Model.Name
+                                    </dd>
+
+                                    <dt class="col-sm-4">
+                                        Ngày tạo:
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                                    </dd>
+
+                                    <dt class="col-sm-4">
+                                        Ngày cập nhật gần nhất:
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @if (Model.UpdatedAt.HasValue)
+                                        {
+                                            @Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-secondary">Chưa có cập nhật</span>
+                                        }
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                        <a asp-action="Update" asp-route-id="@Model.CategoriesId" class="btn btn-warning float-right">
+                            <i class="fas fa-pen"></i> Cập nhật
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
