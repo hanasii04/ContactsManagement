@@ -7,27 +7,27 @@
 
 **Contact Pro** là giải pháp số hóa danh bạ toàn diện được phát triển trên nền tảng ASP.NET Core MVC hiệu năng cao. Dự án không chỉ dừng lại ở việc lưu trữ thông tin, mà còn tập trung xây dựng một hệ thống phân quyền chặt chẽ (Role-based Authorization), đảm bảo tính bảo mật tuyệt đối giữa dữ liệu cá nhân của Người dùng và quyền giám sát của Quản trị viên. Với giao diện AdminLTE được tùy biến sâu, Contact Pro mang lại trải nghiệm mượt mà, hiện đại và tối ưu trên mọi thiết bị.
 
-## 🚀 Tính năng chính (Key Features)
+## 🚀 Tính năng chính 
 
-### 👤 Phân hệ User (Người dùng)
+### 👤 Phân hệ User 
 * **Authentication:** Hệ thống xác thực tự xây dựng sử dụng **Cookie Authentication**
 * **Dashboard cá nhân:** Thống kê tổng quan số lượng liên hệ, liên hệ mới thêm trong tháng.
 * **Quản lý danh bạ:** Xem, thêm, sửa, xóa và tìm kiếm danh bạ cá nhân.
 * **Hồ sơ cá nhân:** Cập nhật thông tin tài khoản.
 
-### 🛡️ Phân hệ Admin (Quản trị viên)
+### 🛡️ Phân hệ Admin 
 * **Dashboard hệ thống:** Cái nhìn toàn cảnh về hoạt động của toàn bộ hệ thống.
 * **Quản lý người dùng:** Xem danh sách user, xem chi tiết hồ sơ, khóa/mở khóa tài khoản.
 * **Quản lý liên hệ hệ thống:** Admin có quyền xem danh sách tất cả liên hệ trong Database.
 
-## 🛠️ Công nghệ sử dụng (Tech Stack)
+## 🛠️ Công nghệ sử dụng 
 
 * **Backend:** C#, ASP.NET Core MVC, Entity Framework Core.
 * **Database:** SQL Server.
 * **Frontend:** Razor Views, Bootstrap 5, AdminLTE 3 Template.
 * **Authentication:** Cookie Authentication
 
-## 📸 Hình ảnh minh họa (Screenshots)
+## 📸 Hình ảnh minh họa
 
 ### 1. Admin Dashboard
 Giao diện dành cho quản trị viên với các thống kê về liên hệ và người dùng.
@@ -49,7 +49,7 @@ Trang chi tiết liên hệ của người dùng.
 ![My Contact](./docs/contact-details.png
 )
 
-## ⚙️ Cài đặt & Chạy dự án (Installation)
+## ⚙️ Cài đặt & Chạy dự án
 
 Để chạy dự án này trên máy cục bộ, hãy làm theo các bước sau:
 
@@ -76,19 +76,19 @@ Trang chi tiết liên hệ của người dùng.
     dotnet run
     ```
 
-## 🛣️ Roadmap (Dự định phát triển)
+## 🛣️ Roadmap 
 
 - [x] Thiết lập cấu trúc dự án & Database.
 - [x] Tích hợp giao diện AdminLTE.
 - [x] Chức năng Admin: Quản lý người dùng, quản lý liên hệ.
 - [x] Authentication, Authorization.
 - [x] User Dashboard & Layout riêng.
-- [ ] Chức năng User: Quản lý danh mục cá nhân.
-- [ ] Chức năng User: Quản lý danh bạ cá nhân.
+- [x] Chức năng User: Quản lý danh mục cá nhân.
+- [x] Chức năng User: Quản lý danh bạ cá nhân.
 - [ ] Chức năng User: Thay đổi thông tin cá nhân.
 - [ ] Nhập/xuất dữ liệu CSV.
 
-## 🤝 Đóng góp (Contributing)
+## 🤝 Đóng góp 
 Dự án này được xây dựng cho mục đích học tập. Mọi ý kiến đóng góp đều được hoan nghênh!
 
 ---
