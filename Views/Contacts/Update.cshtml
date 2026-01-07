@@ -1,0 +1,179 @@
+﻿@model ContactsManagement.DTOs.Contact.ContactDTO
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    :root {
+        --custom-radius: 12px;
+    }
+
+    /* Bo tròn Card */
+    .card-rounded {
+        border-radius: var(--custom-radius) !important;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+    }
+
+    /* Bo tròn Input và Button */
+    .form-control, .btn {
+        border-radius: var(--custom-radius);
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    label {
+        font-weight: 500;
+    }
+
+    /* Style riêng cho khung checkbox danh mục (Copy từ trang Create) */
+    .category-box {
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-radius: var(--custom-radius);
+        padding: 15px;
+    }
+</style>
+
+<section class="content-header pb-2">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 font-weight-bold">Cập nhật liên hệ</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-action="Index">Danh bạ</a></li>
+                    <li class="breadcrumb-item active">Cập nhật</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+
+            <div class="col-md-12 col-xl-10">
+
+                <div class="card card-primary shadow-sm card-rounded">
+
+                    <div class="card-header py-3">
+                        <h3 class="card-title font-weight-bold">
+                            Chỉnh sửa thông tin
+                        </h3>
+                    </div>
+
+                    <form asp-action="Update" method="post">
+                        <input type="hidden" asp-for="ContactId" />
+
+                        <div class="card-body pt-4 px-4">
+
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="FullName" class="control-label small text-muted mb-1">Họ và tên <span class="text-danger">*</span></label>
+                                        <input asp-for="FullName" class="form-control" placeholder="Nguyễn Văn Hoàng" autofocus />
+                                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label asp-for="PhoneNumber" class="control-label small text-muted mb-1">Số điện thoại <span class="text-danger">*</span></label>
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="0123456789" />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label small text-muted mb-1">Danh mục</label>
+
+                                        <div class="category-box shadow-sm">
+                                            @{
+                                                var categories = ViewBag.CategoryId as SelectList;
+                                            }
+
+                                            @if (categories != null && categories.Any())
+                                            {
+                                                foreach (var item in categories)
+                                                {
+                                                    // QUAN TRỌNG: Kiểm tra xem danh mục này đã được chọn trước đó chưa
+                                                    // item.Value là string, cần parse sang int để so sánh với List<int> CategoryIds
+                                                    bool isChecked = Model.CategoryIds != null && Model.CategoryIds.Contains(int.Parse(item.Value));
+
+                                                    <div class="custom-control custom-checkbox mb-2">
+                                                        <input type="checkbox"
+                                                               class="custom-control-input"
+                                                               id="cat_@item.Value"
+                                                               name="CategoryIds"
+                                                               value="@item.Value"
+                                                        @(isChecked ? "checked" : "")> <label class="custom-control-label" for="cat_@item.Value" style="cursor:pointer">
+                                                            @item.Text
+                                                        </label>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="text-center text-muted small py-4">
+                                                    Chưa có danh mục nào
+                                                </div>
+                                            }
+                                        </div>
+                                        <span asp-validation-for="CategoryIds" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="control-label small text-muted mb-1">Email</label>
+                                        <input asp-for="Email" class="form-control" type="email" placeholder="email@example.com" />
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Address" class="control-label small text-muted mb-1">Địa chỉ</label>
+                                        <input asp-for="Address" class="form-control" placeholder="Thanh Oai - Hà Nội" />
+                                        <span asp-validation-for="Address" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-0">
+                                <label asp-for="Notes" class="control-label small text-muted mb-1">Ghi chú</label>
+                                <textarea asp-for="Notes" class="form-control" rows="2" placeholder="Ghi chú về liên hệ"></textarea>
+                                <span asp-validation-for="Notes" class="text-danger small"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer bg-white py-3 px-4">
+                            <a asp-action="Index" class="btn btn-default">
+                                <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary float-right px-4 shadow-sm">
+                                Cập nhật
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

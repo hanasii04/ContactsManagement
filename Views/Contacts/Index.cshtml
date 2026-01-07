@@ -1,0 +1,222 @@
+﻿@model IEnumerable<ContactsManagement.DTOs.Contact.ContactDTO>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentFilter = ViewData["CurrentFilter"] as string;
+}
+
+<style>
+    /* Style riêng cho Avatar User (Tông tím/xanh) */
+    .avatar-contact {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e8eaf6; /* Tím rất nhạt */
+        color: #3f51b5; /* Tím Indigo */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Hover vào dòng bảng */
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Gradient Button cho nút Thêm mới */
+    .btn-gradient-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
+    }
+
+        .btn-gradient-primary:hover {
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px rgba(0, 123, 255, 0.3);
+        }
+</style>
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark" style="font-weight: 700;">Danh bạ của tôi</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Index">Tổng quan</a></li>
+                    <li class="breadcrumb-item active">Danh bạ</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="card card-outline card-primary" style="border-radius: 12px; border-top-width: 3px;">
+
+            <div class="card-header border-0 pt-3 pb-3">
+                <div class="row align-items-center">
+                    <div class="col-md-4 mb-2 mb-md-0">
+                        <a asp-action="Create" class="btn btn-gradient-primary px-4 py-2" style="border-radius: 8px; font-weight: 600;">
+                            <i class="fas fa-user-plus mr-2"></i> Thêm liên hệ mới
+                        </a>
+                    </div>
+
+                    <div class="col-md-8">
+                        <form asp-action="Index" method="get">
+                            <div class="input-group" style="max-width: 400px; margin-left: auto;">
+                                <input type="text" name="searchString" class="form-control"
+                                       placeholder="Tìm theo tên, số điện thoại, email..."
+                                       value="@currentFilter"
+                                       style="border-radius: 8px 0 0 8px; border-color: #dee2e6;">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default" style="border-radius: 0 8px 8px 0; border-color: #dee2e6;">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover table-striped valign-middle">
+                    <thead style="background-color: #f4f6f9;">
+                        <tr>
+                            <th style="width: 5%;" class="text-center">#</th>
+                            <th style="width: 30%;">Họ và Tên</th>
+                            <th style="width: 20%;">Số điện thoại</th>
+                            <th style="width: 25%;">Email</th>
+                            <th style="width: 20%;" class="text-right pr-4">Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="text-center align-middle">
+                                        <div class="avatar-contact mx-auto">
+                                            @(item.FullName?.Substring(0, 1).ToUpper() ?? "?")
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <a asp-action="Details" asp-route-id="@item.ContactId" class="font-weight-bold text-dark" style="font-size: 1rem;">
+                                            @item.FullName
+                                        </a>
+                                        <br />
+                                        @if (item.CreatedAt != DateTime.MinValue)
+                                        {
+                                            <small class="text-muted">
+                                                <i class="far fa-calendar-alt mr-1"></i> @item.CreatedAt.ToString("dd/MM/yyyy")
+                                            </small>
+                                        }
+                                    </td>
+                                    <td class="align-middle">
+                                        @if (!string.IsNullOrEmpty(item.PhoneNumber))
+                                        {
+                                            <span class="badge badge-light" style="font-size: 0.9rem; font-weight: 500;">
+                                                @item.PhoneNumber
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small font-italic">--</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @(string.IsNullOrEmpty(item.Email) ? Html.Raw("<span class='text-muted font-italic'>Chưa cập nhật</span>") : item.Email)
+                                    </td>
+                                    <td class="text-right align-middle pr-4">
+                                        <a asp-action="Details" asp-route-id="@item.ContactId"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Xem chi tiết" style="border-radius: 6px; margin-right: 5px;">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <a asp-action="Update" asp-route-id="@item.ContactId"
+                                           class="btn btn-sm btn-outline-info"
+                                           title="Chỉnh sửa" style="border-radius: 6px; margin-right: 5px;">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+                                        <form asp-action="Delete" asp-route-id="@item.ContactId" method="post"
+                                              id="delete-form-@item.ContactId" style="display: inline-block;">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="button" onclick="confirmDelete(@item.ContactId)"
+                                                    class="btn btn-sm btn-outline-danger" title="Xóa" style="border-radius: 6px;">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-address-book fa-3x mb-3" style="opacity: 0.2;"></i>
+                                        <p class="mb-1">Không tìm thấy liên hệ nào</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer bg-white border-top-0">
+                <small class="text-muted">Hiển thị @(Model?.Count() ?? 0) liên hệ</small>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Hàm xử lý khi bấm nút xóa
+        function confirmDelete(contactId) {
+            Swal.fire({
+                title: 'Xóa liên hệ này',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy bỏ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + contactId).submit();
+                }
+            })
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: '@Html.Raw(TempData["SuccessMessage"])',
+                        timer: 2000, 
+                        showConfirmButton: false
+                    })
+            </text>
+        }
+    </script>
+}
