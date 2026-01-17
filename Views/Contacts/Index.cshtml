@@ -68,6 +68,12 @@
                         <a asp-action="Create" class="btn btn-gradient-primary px-4 py-2" style="border-radius: 8px; font-weight: 600;">
                             <i class="fas fa-user-plus mr-2"></i> Thêm liên hệ mới
                         </a>
+                        <a asp-action="Export" class="btn btn-outline-info px-3 py-2" style="border-radius: 8px;">
+                            <i class="fas fa-download mr-1"></i> Xuất
+                        </a>
+                        <button type="button" class="btn btn-outline-success px-3 py-2 mr-1" data-toggle="modal" data-target="#importModal" style="border-radius: 8px;">
+                            <i class="fas fa-file-excel mr-1"></i> Nhập
+                        </button>
                     </div>
 
                     <div class="col-md-8">
@@ -184,6 +190,36 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="border-radius: 12px;">
+                <div class="modal-header">
+                    <h5 class="modal-title font-weight-bold" id="importModalLabel">Nhập danh bạ từ Excel</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form asp-action="Import" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Chọn file Excel (.xlsx)</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="fileExcel" id="customFile" accept=".xlsx" required>
+                                <label class="custom-file-label" for="customFile" style="border-radius: 8px;">Chọn file...</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="border-radius: 8px;">Hủy</button>
+                        <button type="submit" class="btn btn-success" style="border-radius: 8px;">
+                            <i class="fas fa-upload mr-1"></i> Tải lên
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </section>
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -216,6 +252,22 @@
                         timer: 2000, 
                         showConfirmButton: false
                     })
+            </text>
+        }
+
+        $(".custom-file-input").on("change", function() {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: '@Html.Raw(TempData["ErrorMessage"])'
+                });
             </text>
         }
     </script>
