@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using ClosedXML.Excel;
 
 namespace ContactsManagement.Controllers
 {
@@ -277,5 +278,159 @@ namespace ContactsManagement.Controllers
 
 			ViewData["CategoryId"] = new SelectList(categories, "CategoriesId", "Name");
 		}
+
+		[HttpGet]
+		public async Task<IActionResult> Export()
+		{
+			var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (!int.TryParse(userIdString, out int userId)) return RedirectToAction("Login", "Auth");
+
+			// Lấy danh sách liên hệ của user hiện tại (chưa xóa)
+			var contacts = await _context.Contacts
+				.AsNoTracking()
+				.Where(c => c.UserId == userId && c.IsDeleted == false)
+				.OrderByDescending(c => c.CreatedAt)
+				.ToListAsync();
+
+			using (var workbook = new XLWorkbook())
+			{
+				var worksheet = workbook.Worksheets.Add("Danh bạ");
+
+				// Tạo dòng tiêu đề
+				worksheet.Cell(1, 1).Value = "Họ và Tên";
+				worksheet.Cell(1, 2).Value = "Số điện thoại";
+				worksheet.Cell(1, 3).Value = "Email";
+				worksheet.Cell(1, 4).Value = "Địa chỉ";
+				worksheet.Cell(1, 5).Value = "Ghi chú";
+
+				// Style cho Header
+				var headerRow = worksheet.Row(1);
+				headerRow.Style.Font.Bold = true;
+				headerRow.Style.Fill.BackgroundColor = XLColor.LightGray;
+
+				// Đổ dữ liệu vào
+				int row = 2;
+				foreach (var item in contacts)
+				{
+					worksheet.Cell(row, 1).Value = item.FullName;
+					worksheet.Cell(row, 2).Value = item.PhoneNumber;
+					worksheet.Cell(row, 2).Style.NumberFormat.Format = "@";
+					worksheet.Cell(row, 3).Value = item.Email;
+					worksheet.Cell(row, 4).Value = item.Address;
+					worksheet.Cell(row, 5).Value = item.Notes;
+					row++;
+				}
+
+				// Tự động căn chỉnh độ rộng cột
+				worksheet.Columns().AdjustToContents();
+
+				// Xuất file ra stream
+				using (var stream = new MemoryStream())
+				{
+					workbook.SaveAs(stream);
+					var content = stream.ToArray();
+					return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DanhBa_Export.xlsx");
+				}
+			}
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Import(IFormFile fileExcel)
+		{
+			var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (!int.TryParse(userIdString, out int userId)) return RedirectToAction("Login", "Auth");
+
+			if (fileExcel == null || fileExcel.Length == 0)
+			{
+				TempData["ErrorMessage"] = "Vui lòng chọn file Excel!";
+				return RedirectToAction(nameof(Index));
+			}
+
+			try
+			{
+				// Tải SĐT có sẵn lên HashSet để check trùng nhanh chóng
+				var existingPhoneNumbers = await _context.Contacts
+					.Where(c => c.UserId == userId && !c.IsDeleted)
+					.Select(c => c.PhoneNumber)
+					.ToListAsync();
+
+				var existingPhoneSet = new HashSet<string>(existingPhoneNumbers);
+
+				using (var stream = new MemoryStream())
+				{
+					await fileExcel.CopyToAsync(stream);
+					using (var workbook = new XLWorkbook(stream))
+					{
+						var worksheet = workbook.Worksheet(1);
+						var rows = worksheet.RangeUsed().RowsUsed().Skip(1); // Bỏ qua dòng tiêu đề
+
+						var listContactsToAdd = new List<Contacts>();
+						int countDuplicate = 0;
+
+						foreach (var row in rows)
+						{
+							var fullName = row.Cell(1).GetValue<string>().Trim();
+							var rawPhone = row.Cell(2).GetValue<string>().Trim();
+
+							// Xử lý trường hợp Excel tự xóa số 0 ở đầu (VD: 9123... -> 09123...)
+							string phone = rawPhone;
+							if (long.TryParse(rawPhone, out _) && !rawPhone.StartsWith("0") && rawPhone.Length == 9)
+							{
+								phone = "0" + rawPhone;
+							}
+
+							var email = row.Cell(3).GetValue<string>().Trim();
+							var address = row.Cell(4).GetValue<string>().Trim();
+							var notes = row.Cell(5).GetValue<string>().Trim();
+
+							if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(phone))
+							{
+								continue;
+							}
+
+							// Check trùng: Trùng trong DB hoặc trùng lặp ngay trong file Excel
+							if (existingPhoneSet.Contains(phone) || listContactsToAdd.Any(c => c.PhoneNumber == phone))
+							{
+								countDuplicate++;
+								continue;
+							}
+
+							listContactsToAdd.Add(new Contacts
+							{
+								FullName = fullName,
+								PhoneNumber = phone,
+								Email = email,
+								Address = address,
+								Notes = notes,
+								UserId = userId,
+								CreatedAt = DateTime.UtcNow,
+								IsDeleted = false
+							});
+						}
+
+						if (listContactsToAdd.Any())
+						{
+							_context.Contacts.AddRange(listContactsToAdd);
+							await _context.SaveChangesAsync();
+							TempData["SuccessMessage"] = $"Đã nhập thành công {listContactsToAdd.Count} liên hệ.";
+						}
+						else
+						{
+							TempData["ErrorMessage"] = countDuplicate > 0
+								? $"Không thể thêm mới, {countDuplicate} liên hệ trong file đều đã tồn tại!"
+								: "File Excel không có dữ liệu hợp lệ!";
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				TempData["ErrorMessage"] = "Lỗi khi đọc file: " + ex.Message;
+			}
+
+			return RedirectToAction(nameof(Index));
+		}
 	}
 }
+
