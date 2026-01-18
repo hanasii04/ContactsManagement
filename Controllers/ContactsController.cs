@@ -117,6 +117,21 @@ namespace ContactsManagement.Controllers
 				return View(model);
 			}
 
+			// Kiểm tra trùng số điện thoại
+			var cleanPhone = model.PhoneNumber.Trim();
+
+			bool isDuplicate = await _context.Contacts
+				.AnyAsync(c => c.UserId == userId && 
+						 !c.IsDeleted && 
+						  c.PhoneNumber == cleanPhone);
+
+			if (isDuplicate)
+			{
+				ModelState.AddModelError("PhoneNumber", "Số điện thoại này đã tồn tại trong danh bạ");
+				await LoadCategoriesToViewBag(userId);
+				return View(model);
+			}
+
 			var contact = new Contacts
 			{
 				FullName = model.FullName,
@@ -203,6 +218,23 @@ namespace ContactsManagement.Controllers
 
 			if (!ModelState.IsValid)
 			{
+				await LoadCategoriesToViewBag(userId);
+				return View(model);
+			}
+
+			// Kiểm tra trùng số điện thoại
+			var cleanPhone = model.PhoneNumber.Trim();
+
+			bool isDuplicate = await _context.Contacts
+				.AnyAsync(c => c.UserId == userId &&
+						 !c.IsDeleted &&
+						  c.PhoneNumber == cleanPhone &&
+						  c.ContactId != id); // Loại trừ chính liên hệ đang sửa
+
+			if (isDuplicate)
+			{
+				ModelState.AddModelError("PhoneNumber", "Số điện thoại này đã tồn tại trong danh bạ");
+				await LoadCategoriesToViewBag(userId);
 				return View(model);
 			}
 
