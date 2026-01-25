@@ -92,8 +92,9 @@ namespace ContactsManagement.Controllers
 				new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // Lưu ID
                 new Claim(ClaimTypes.Name, user.FullName), // Lưu Tên
                 new Claim(ClaimTypes.Email, user.Email), // Lưu Email
-                new Claim(ClaimTypes.Role, user.Role.ToString()) // Lưu Quyền (Admin/User)
-            };
+                new Claim(ClaimTypes.Role, user.Role.ToString()), // Lưu Quyền (Admin/User)
+				new Claim("AvatarPath", user.AvatarPath ?? "") 
+			};
 
 			// Tạo ClaimsIdentity
 			var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
