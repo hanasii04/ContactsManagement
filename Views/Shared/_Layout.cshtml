@@ -122,7 +122,15 @@
                     <div class="image">
                         @if (!string.IsNullOrEmpty(userAvatar))
                         {
-                            <img src="@userAvatar" class="img-circle elevation-1" style="width: 34px; height: 34px; object-fit: cover;" alt="User Image">
+                            <img src="@userAvatar?v=@DateTime.Now.Ticks"
+                                 class="img-circle elevation-1"
+                                 style="width: 34px; height: 34px; object-fit: cover;"
+                                 alt="User Image"
+                                 onerror="this.style.display='none'; document.getElementById('backup-placeholder').style.display='flex';">
+
+                            <div id="backup-placeholder" class="avatar-placeholder elevation-1" style="display: none;">
+                                @firstLetter
+                            </div>
                         }
                         else
                         {

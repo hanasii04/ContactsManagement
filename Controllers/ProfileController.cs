@@ -150,5 +150,60 @@ namespace ContactsManagement.Controllers
 				new ClaimsPrincipal(claimsIdentity),
 				authProperties);
 		}
+
+		[HttpGet]
+		public IActionResult ChangePassword()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ChangePassword(ChangePasswordDTO model)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View(model);
+			}
+
+			var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (!int.TryParse(userIdString, out int userId))
+			{
+				return RedirectToAction("Login", "Auth");
+			}
+
+			var user = await _context.Users.FindAsync(userId);
+			// Trường hợp hy hữu: Cookie vẫn còn hạn nhưng user đã bị xóa trong DB
+			// -> Đăng xuất luôn để xóa Cookie rác
+			if (user == null) return RedirectToAction("Logout", "Auth");
+
+			// Kiểm tra mật khẩu nhập vào có đúng không
+			bool isOldPasswordCorrect = BCrypt.Net.BCrypt.Verify(model.OldPassword, user.PasswordHash);
+
+			if (!isOldPasswordCorrect)
+			{
+				ModelState.AddModelError("OldPassword", "Mật khẩu hiện tại không chính xác");
+				return View(model);
+			}
+
+			// Không cho phép mật khẩu mới trùng với mật khẩu cũ
+			if (BCrypt.Net.BCrypt.Verify(model.NewPassword, user.PasswordHash))
+			{
+				ModelState.AddModelError("NewPassword", "Mật khẩu mới không được trùng với mật khẩu cũ");
+				return View(model);
+			}
+
+			// Hash mật khẩu mới trước khi lưu
+			user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+			user.UpdatedAt = DateTime.UtcNow;
+
+			await _context.SaveChangesAsync();
+
+			TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+
+			ModelState.Clear();
+
+			return View();
+		}
 	}
 }

@@ -8,8 +8,8 @@
 
 <style>
     /* ========================================
-               QUAN TRỌNG: CHỈ ÁP DỤNG CHO PROFILE CARD
-            ======================================== */
+                   QUAN TRỌNG: CHỈ ÁP DỤNG CHO PROFILE CARD
+                ======================================== */
 
     /* KHUNG TỔNG THỂ */
     .profile-card {
@@ -223,7 +223,12 @@
                         <img src="@Model.AvatarPath?v=@DateTime.Now.Ticks"
                              class="rounded-circle mr-3"
                              style="width: 40px; height: 40px; object-fit: cover;"
-                             alt="Avatar">
+                             alt="Avatar"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                        <div class="sidebar-avatar-placeholder" style="display:none;">
+                            @firstLetter
+                        </div>
                     }
                     else
                     {
@@ -276,7 +281,12 @@
                                              src="@Model.AvatarPath?v=@DateTime.Now.Ticks"
                                              class="rounded-circle shadow-sm"
                                              style="width: 80px; height: 80px; object-fit: cover;"
-                                             alt="Avatar">
+                                             alt="Avatar"
+                                             onerror="this.style.display='none'; document.getElementById('avatarPlaceholder').classList.remove('d-none');">
+
+                                        <div id="avatarPlaceholder" class="avatar-placeholder-lg shadow-sm d-none">
+                                            @firstLetter
+                                        </div>
                                     }
                                     else
                                     {
@@ -284,6 +294,7 @@
                                             @firstLetter
                                         </div>
                                     }
+
                                     <img id="avatarPreview" class="shadow-sm" alt="Preview" />
                                 </div>
 
@@ -386,7 +397,7 @@
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     $('#currentAvatar').hide();
-                    $('#avatarPlaceholder').hide();
+                    $('#avatarPlaceholder').addClass('d-none'); // Ẩn placeholder đi
                     $('#avatarPreview').attr('src', e.target.result).show();
                 }
                 reader.readAsDataURL(file);
