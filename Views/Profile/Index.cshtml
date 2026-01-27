@@ -1,0 +1,407 @@
+﻿@model ContactsManagement.DTOs.Profile.UserProfileDTO
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var firstLetter = Model.FullName?.Trim().FirstOrDefault().ToString().ToUpper() ?? "U";
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+}
+
+<style>
+    /* ========================================
+                   QUAN TRỌNG: CHỈ ÁP DỤNG CHO PROFILE CARD
+                ======================================== */
+
+    /* KHUNG TỔNG THỂ */
+    .profile-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        min-height: 600px;
+        border: none;
+    }
+
+        /* CỘT TRÁI: MENU CON PROFILE */
+        .profile-card .profile-sidebar {
+            background-color: #f9fafb;
+            padding: 30px 20px;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        /* Avatar nhỏ trong menu con Profile */
+        .profile-card .sidebar-avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            background-color: #7c3aed;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 1rem;
+            font-size: 18px;
+        }
+
+        /* Style Menu Link TRONG PROFILE CARD */
+        .profile-card .nav-pills .nav-link {
+            color: #4b5563;
+            font-weight: 500;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+            .profile-card .nav-pills .nav-link:hover {
+                background-color: #e5e7eb;
+                color: #111827;
+            }
+
+            .profile-card .nav-pills .nav-link.active {
+                background-color: #e0e7ff;
+                color: #4f46e5;
+                font-weight: 700;
+            }
+
+            .profile-card .nav-pills .nav-link i {
+                width: 24px;
+                margin-right: 8px;
+                color: #9ca3af;
+            }
+
+            .profile-card .nav-pills .nav-link.active i {
+                color: #4f46e5;
+            }
+
+        .profile-card .sidebar-heading {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            font-weight: 700;
+            margin: 25px 0 10px 15px;
+        }
+
+        /* CỘT PHẢI: HEADER */
+        .profile-card .profile-header-wrapper {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .profile-card .profile-header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+        }
+
+        /* Avatar lớn */
+        .profile-card .avatar-placeholder-lg {
+            width: 80px;
+            height: 80px;
+            background-color: #7c3aed;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        /* Style Input */
+        .profile-card .form-group label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-card .custom-input {
+            height: 45px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background-color: #fff !important;
+            color: #111827;
+            font-weight: 500;
+            padding-left: 15px;
+        }
+
+            .profile-card .custom-input:focus {
+                border-color: #8b5cf6;
+                box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            }
+
+            .profile-card .custom-input.input-validation-error {
+                border-color: #dc3545;
+                background-color: #fff8f8 !important;
+            }
+
+            .profile-card .custom-input[readonly] {
+                background-color: #fff !important;
+                opacity: 1;
+                cursor: not-allowed;
+            }
+
+        /* Buttons */
+        .profile-card .btn-purple {
+            background-color: #7c3aed;
+            border-color: #7c3aed;
+            color: white;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 6px;
+        }
+
+            .profile-card .btn-purple:hover {
+                background-color: #6d28d9;
+                color: white;
+            }
+
+        .profile-card .btn-white {
+            background-color: white;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 6px;
+        }
+
+            .profile-card .btn-white:hover {
+                background-color: #f9fafb;
+            }
+
+        .profile-card .text-danger {
+            color: #dc3545 !important;
+            font-size: 0.875em;
+            margin-top: 5px;
+            display: block;
+        }
+
+    /* Preview avatar */
+    #avatarPreview {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 50%;
+        display: none;
+    }
+
+    #avatarPlaceholder {
+        display: flex;
+    }
+</style>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-check-circle mr-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-exclamation-circle mr-2"></i> @TempData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-11 col-xl-10">
+
+        <div class="profile-card d-flex flex-wrap">
+
+            <div class="col-md-3 profile-sidebar">
+                <div class="d-flex align-items-center mb-4 pl-2">
+                    @if (!string.IsNullOrEmpty(Model.AvatarPath))
+                    {
+                        <img src="@Model.AvatarPath?v=@DateTime.Now.Ticks"
+                             class="rounded-circle mr-3"
+                             style="width: 40px; height: 40px; object-fit: cover;"
+                             alt="Avatar"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                        <div class="sidebar-avatar-placeholder" style="display:none;">
+                            @firstLetter
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="sidebar-avatar-placeholder">
+                            @firstLetter
+                        </div>
+                    }
+
+                    <div style="line-height: 1.2;">
+                        <div class="font-weight-bold text-dark">@Model.FullName</div>
+                        <small class="text-muted">Cài đặt</small>
+                    </div>
+                </div>
+
+                <div class="nav flex-column nav-pills">
+                    <div class="sidebar-heading">Tài khoản</div>
+                    <a asp-action="Index" asp-controller="Profile"
+                       class="nav-link @(currentAction == "Index" ? "active" : "")">
+                        <i class="far fa-user"></i> Hồ sơ cá nhân
+                    </a>
+                    <a asp-action="ChangePassword" asp-controller="Profile"
+                       class="nav-link @(currentAction == "ChangePassword" ? "active" : "")">
+                        <i class="fas fa-lock"></i> Mật khẩu
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-9 profile-content p-0">
+                <div class="profile-header-wrapper">
+                    <h2 class="profile-header-title">@ViewData["Title"]</h2>
+                </div>
+
+                <div class="p-4">
+                    <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="Role" />
+                        <input type="hidden" asp-for="CreatedAt" />
+                        <input type="hidden" asp-for="UpdatedAt" />
+                        <input type="hidden" asp-for="AvatarPath" />
+
+                        <div class="mb-5">
+                            <h5 class="font-weight-bold mb-3" style="font-size: 1.1rem;">Ảnh đại diện</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-container mr-4">
+                                    @if (!string.IsNullOrEmpty(Model.AvatarPath))
+                                    {
+                                        <img id="currentAvatar"
+                                             src="@Model.AvatarPath?v=@DateTime.Now.Ticks"
+                                             class="rounded-circle shadow-sm"
+                                             style="width: 80px; height: 80px; object-fit: cover;"
+                                             alt="Avatar"
+                                             onerror="this.style.display='none'; document.getElementById('avatarPlaceholder').classList.remove('d-none');">
+
+                                        <div id="avatarPlaceholder" class="avatar-placeholder-lg shadow-sm d-none">
+                                            @firstLetter
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div id="avatarPlaceholder" class="avatar-placeholder-lg shadow-sm">
+                                            @firstLetter
+                                        </div>
+                                    }
+
+                                    <img id="avatarPreview" class="shadow-sm" alt="Preview" />
+                                </div>
+
+                                <div>
+                                    <div class="mb-2">
+                                        <input type="file"
+                                               id="avatarFileInput"
+                                               name="AvatarFile"
+                                               accept="image/png,image/jpeg,image/gif"
+                                               style="display: none;"
+                                               onchange="handleFileSelect(this)" />
+
+                                        <button type="button" class="btn btn-purple mr-2" onclick="document.getElementById('avatarFileInput').click()">
+                                            <i class="fas fa-cloud-upload-alt mr-2"></i> Tải ảnh lên
+                                        </button>
+
+                                    </div>
+                                    <small class="text-muted">Hỗ trợ định dạng PNG, JPEG và GIF dưới 10MB</small>
+                                    <span asp-validation-for="AvatarFile" class="text-danger d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Họ và tên</label>
+                                    <input asp-for="FullName" class="form-control custom-input" placeholder="Nhập tên của bạn">
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mt-2">
+                                <div class="form-group">
+                                    <label>Địa chỉ Email</label>
+                                    <input asp-for="Email" class="form-control custom-input" placeholder="Nhập email của bạn">
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-5">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="font-weight-bold mb-1">Mật khẩu</h5>
+                                <p class="text-muted mb-0">Nên thay đổi mật khẩu định kỳ để bảo vệ tài khoản của bạn</p>
+                            </div>
+                            <a asp-action="ChangePassword" asp-controller="Profile" class="btn btn-white pt-2 pb-2">
+                                <i class="fas fa-key mr-2"></i> Đổi mật khẩu
+                            </a>
+                        </div>
+
+                        <div class="mt-5 text-right">
+                            <button type="button" class="btn btn-white mr-2" onclick="window.location.reload()">
+                                <i class="fas fa-times mr-1"></i> Hủy bỏ
+                            </button>
+                            <button type="submit" class="btn btn-purple px-4">
+                                <i class="fas fa-save mr-2"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Tự động tắt thông báo alert sau 5 giây
+        window.setTimeout(function () {
+            $(".alert-success, .alert-danger").fadeTo(500, 0).slideUp(500, function () {
+                $(this).remove();
+            });
+        }, 3000);
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('Kích thước ảnh không được vượt quá 10MB');
+                    input.value = '';
+                    return;
+                }
+
+                var validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Chỉ hỗ trợ định dạng PNG, JPEG và GIF');
+                    input.value = '';
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#currentAvatar').hide();
+                    $('#avatarPlaceholder').addClass('d-none'); // Ẩn placeholder đi
+                    $('#avatarPreview').attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+}

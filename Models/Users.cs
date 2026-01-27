@@ -16,6 +16,7 @@ namespace ContactsManagement.Models
 		public string? PasswordHash { get; set; }
 		public UserRole Role { get; set; } = UserRole.User;
 		public bool IsActive { get; set; } = true;
+		public string? AvatarPath { get; set; }
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 		public DateTime? UpdatedAt { get; set; }
 		[MaxLength(50)]

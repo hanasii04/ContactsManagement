@@ -1,0 +1,143 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+
+    // Logic lấy chữ cái đầu cho Sidebar (Dùng tên đăng nhập nếu chưa có dữ liệu khác)
+    var userName = User.Identity.Name ?? "User";
+    var firstLetter = userName.Trim().Substring(0, 1).ToUpper();
+}
+
+<style>
+    /* KHUNG TỔNG THỂ - Bo góc toàn bộ ở đây */
+    .profile-card {
+        background: #fff;
+        border-radius: 16px; /* Bo góc mạnh cho cả khung to */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Bóng đổ mềm mại */
+        overflow: hidden; /* CẮT GÓC: Bắt buộc có để nội dung bên trong không chòi ra khỏi góc bo */
+        min-height: 600px;
+        border: none;
+    }
+
+    /* CỘT TRÁI: MENU */
+    .profile-sidebar {
+        background-color: #f9fafb;
+        padding: 30px 20px;
+        border-right: 1px solid #e5e7eb;
+    }
+
+    /* Avatar nhỏ ở Sidebar */
+    .sidebar-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        background-color: #7c3aed; /* Tím */
+        color: white;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 1rem;
+        font-size: 18px;
+    }
+
+    /* Style Menu Link */
+    .nav-pills .nav-link {
+        color: #4b5563;
+        font-weight: 500;
+        padding: 10px 15px;
+        margin-bottom: 5px;
+        border-radius: 8px; /* Bo góc nút menu */
+        transition: all 0.2s;
+    }
+
+        .nav-pills .nav-link:hover {
+            background-color: #e5e7eb;
+            color: #111827;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #e5e7eb;
+            color: #000;
+            font-weight: 700;
+        }
+
+        .nav-pills .nav-link i {
+            width: 24px;
+            margin-right: 8px;
+            color: #9ca3af;
+        }
+
+        .nav-pills .nav-link.active i {
+            color: #111827;
+        }
+
+    .sidebar-heading {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #9ca3af;
+        font-weight: 700;
+        margin: 25px 0 10px 15px;
+    }
+
+    /* CỘT PHẢI: HEADER */
+    .profile-header-wrapper {
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .profile-header-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin: 0;
+    }
+</style>
+
+<section class="content pt-4 pb-4">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-11 col-xl-10">
+
+                <div class="profile-card d-flex flex-wrap">
+
+                    <div class="col-md-3 profile-sidebar">
+                        <div class="d-flex align-items-center mb-4 pl-2">
+                            <div class="sidebar-avatar-placeholder">
+                                @firstLetter
+                            </div>
+
+                            <div style="line-height: 1.2;">
+                                <div class="font-weight-bold text-dark">@userName</div>
+                                <small class="text-muted">Cài đặt</small>
+                            </div>
+                        </div>
+
+                        <div class="nav flex-column nav-pills">
+                            <div class="sidebar-heading">Tài khoản</div>
+                            <a asp-action="Index" asp-controller="Profile"
+                               class="nav-link @(currentAction == "Index" ? "active" : "")">
+                                <i class="far fa-user"></i> Hồ sơ cá nhân
+                            </a>
+                            <a asp-action="ChangePassword" asp-controller="Profile"
+                               class="nav-link @(currentAction == "ChangePassword" ? "active" : "")">
+                                <i class="fas fa-lock"></i> Mật khẩu
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9 profile-content p-0">
+                        <div class="profile-header-wrapper">
+                            <h2 class="profile-header-title">@ViewData["Title"]</h2>
+                        </div>
+
+                        <div class="p-4">
+                            @RenderBody()
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    @await RenderSectionAsync("Scripts", required: false)
+</section>

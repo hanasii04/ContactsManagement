@@ -1,6 +1,14 @@
-﻿@{
-    // Lấy Controller hiện tại để active menu
+﻿@using System.Security.Claims
+@{
+    // 1. Lấy Controller hiện tại để active menu
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+
+    // 2. Lấy Avatar và Tên từ Claim
+    var userAvatar = User.FindFirst("AvatarPath")?.Value;
+    var userName = User.Identity.Name ?? "U";
+
+    // Logic lấy chữ cái đầu (để làm Avatar mặc định nếu chưa có ảnh)
+    var firstLetter = !string.IsNullOrEmpty(userName) ? userName.Trim().Substring(0, 1).ToUpper() : "U";
 }
 
 <!DOCTYPE html>
@@ -13,6 +21,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,600,700&display=fallback">
     <link rel="stylesheet" href="~/adminlte/plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="~/adminlte/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
         /* 1. NỀN TRANG: Màu xám xanh nhẹ */
@@ -65,6 +74,21 @@
             font-size: 1.1rem;
             margin-right: 10px;
         }
+
+        /* CSS MỚI: Avatar chữ cái (Placeholder) ở Sidebar */
+        .user-panel .avatar-placeholder {
+            width: 34px;
+            height: 34px;
+            background-color: #7c3aed; /* Màu xanh dương (hoặc #7c3aed nếu thích tím) */
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 16px;
+            user-select: none;
+        }
     </style>
 </head>
 
@@ -94,9 +118,26 @@
             </a>
 
             <div class="sidebar">
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex" style="border-bottom: 1px solid #f0f0f0;">
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center" style="border-bottom: 1px solid #f0f0f0;">
                     <div class="image">
-                        <img src="~/adminlte/dist/img/user2-160x160.jpg" class="img-circle elevation-1" alt="User Image">
+                        @if (!string.IsNullOrEmpty(userAvatar))
+                        {
+                            <img src="@userAvatar?v=@DateTime.Now.Ticks"
+                                 class="img-circle elevation-1"
+                                 style="width: 34px; height: 34px; object-fit: cover;"
+                                 alt="User Image"
+                                 onerror="this.style.display='none'; document.getElementById('backup-placeholder').style.display='flex';">
+
+                            <div id="backup-placeholder" class="avatar-placeholder elevation-1" style="display: none;">
+                                @firstLetter
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="avatar-placeholder elevation-1">
+                                @firstLetter
+                            </div>
+                        }
                     </div>
                     <div class="info">
                         <a href="#" class="d-block font-weight-bold text-dark">
@@ -137,9 +178,10 @@
                         <li class="nav-header text-uppercase font-weight-bold text-muted mt-3" style="font-size: 12px;">Tài khoản</li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a asp-controller="Profile" asp-action="Index"
+                               class="nav-link @(currentController == "Profile" ? "active" : "")">
                                 <i class="nav-icon fas fa-user-circle"></i>
-                                <p>Hồ sơ cá nhân</p>
+                                <p>Cài đặt</p>
                             </a>
                         </li>
 
@@ -177,6 +219,7 @@
     <script src="~/adminlte/plugins/jquery/jquery.min.js"></script>
     <script src="~/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/adminlte/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
