@@ -85,11 +85,8 @@ Trang chi tiết liên hệ của người dùng.
 - [x] User Dashboard & Layout riêng.
 - [x] Chức năng User: Quản lý danh mục cá nhân.
 - [x] Chức năng User: Quản lý danh bạ cá nhân.
-- [ ] Chức năng User: Thay đổi thông tin cá nhân.
+- [x] Chức năng User: Thay đổi thông tin cá nhân.
 - [x] Nhập/xuất dữ liệu CSV.
 
 ## 🤝 Đóng góp 
 Dự án này được xây dựng cho mục đích học tập. Mọi ý kiến đóng góp đều được hoan nghênh!
-
----
-**Author:** [Hoàng]

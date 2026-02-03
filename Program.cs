@@ -1,4 +1,6 @@
-﻿using ContactsManagement.Models;
+﻿using ContactsManagement.Interfaces;
+using ContactsManagement.Models;
+using ContactsManagement.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +25,8 @@ namespace ContactsManagement
 				options.ExpireTimeSpan = TimeSpan.FromDays(7); // Cookie sống trong 7 ngày
 				options.AccessDeniedPath = "/Auth/AccessDenied"; // Nếu không đủ quyền
 			});
+
+			builder.Services.AddTransient<IEmailService, EmailService>();
 
 			var app = builder.Build();
 
