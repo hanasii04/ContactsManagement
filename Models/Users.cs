@@ -23,6 +23,8 @@ namespace ContactsManagement.Models
 		public string ProviderName { get; set; } = "local"; // Mặc định là "local"
 		[MaxLength(255)]
 		public string? ProviderID { get; set; } // ID từ Google/Facebook
+		public string? ResetToken { get; set; } // Token duy nhất trong Link
+		public DateTime? ResetTokenExpiry { get; set; } // Thời gian hết hạn của Link
 		public virtual ICollection<Contacts> Contacts { get; set; } = new List<Contacts>();
 		public virtual ICollection<Categories> Categories { get; set; } = new List<Categories>();
 	}
