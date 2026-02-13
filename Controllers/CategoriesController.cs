@@ -1,5 +1,9 @@
 ﻿using ContactsManagement.DTOs.Categories;
+using ContactsManagement.DTOs.Contact;
+using ContactsManagement.Helpers;
 using ContactsManagement.Models;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,13 +15,14 @@ namespace ContactsManagement.Controllers
 	public class CategoriesController : Controller
 	{
 		private readonly AppDbContext _context;
+		private const int pageSize = 10;
 		public CategoriesController(AppDbContext context)
 		{ 
 			_context = context;
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Index(string searchString)
+		public async Task<IActionResult> Index(string searchString, int pageNumber = 1)
 		{
 			// Lấy UserId từ Claims rồi ép kiểu về int
 			var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -32,18 +37,29 @@ namespace ContactsManagement.Controllers
 				query = query.Where(c => c.Name.Contains(searchString.Trim()));
 			}
 
-			var categories = await query.OrderByDescending(c => c.CreatedAt)
+			if (pageNumber < 0)
+			{
+				pageNumber = 1;
+			}
+
+			var categories = query.OrderByDescending(c => c.CreatedAt)
 				.Select(c => new CategoriesDTO
 				{
 					CategoriesId = c.CategoriesId,
 					Name = c.Name,
 					CreatedAt = c.CreatedAt,
 					UpdatedAt = c.UpdatedAt
-				})
-				.ToListAsync();
+				});
+
+			var paginatedCategories = await PaginatedList<CategoriesDTO>.CreateAsync(
+				categories,
+				pageNumber,
+				pageSize
+			);
 
 			ViewData["CurrentFilter"] = searchString;
-			return View(categories);
+			ViewData["CurrentPage"] = pageNumber;
+			return View(paginatedCategories);
 		}
 
 		[HttpGet]

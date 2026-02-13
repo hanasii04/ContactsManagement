@@ -1,8 +1,13 @@
-﻿@model IEnumerable<ContactsManagement.DTOs.Contact.ContactDTO>
+﻿@using ContactsManagement.Models
+@model ContactsManagement.Helpers.PaginatedList<ContactsManagement.DTOs.Contact.ContactDTO>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     var currentFilter = ViewData["CurrentFilter"] as string;
+
+    // Tính toán trạng thái nút phân trang
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
 <style>
@@ -39,6 +44,28 @@
             transform: translateY(-1px);
             box-shadow: 0 6px 8px rgba(0, 123, 255, 0.3);
         }
+
+    /* Style cho phân trang */
+    .page-link {
+        color: #007bff;
+        border-radius: 6px !important;
+        margin: 0 2px;
+        border: none;
+        background-color: #f4f6f9;
+    }
+
+    .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,123,255,0.25);
+    }
+
+    .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #fff;
+        opacity: 0.6;
+    }
 </style>
 
 <div class="content-header">
@@ -106,9 +133,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model != null && Model.Any())
+                        @if (Model != null && Model.Items != null && Model.Items.Any())
                         {
-                            foreach (var item in Model)
+                            foreach (var item in Model.Items)
                             {
                                 <tr>
                                     <td class="text-center align-middle">
@@ -185,11 +212,58 @@
                 </table>
             </div>
 
-            <div class="card-footer bg-white border-top-0">
-                <small class="text-muted">Hiển thị @(Model?.Count() ?? 0) liên hệ</small>
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center py-3">
+
+                <div class="text-muted small">
+                    Hiển thị <b>@Model.Items.Count</b> trong tổng số <b>@Model.TotalCount</b> kết quả (Trang @Model.PageIndex / @Model.TotalPages)
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-sm m-0">
+                            <li class="page-item @prevDisabled">
+                                <a asp-action="Index"
+                                   asp-route-pageNumber="@(Model.PageIndex - 1)"
+                                   asp-route-searchString="@currentFilter"
+                                   class="page-link">
+                                    <i class="fas fa-chevron-left mr-1"></i> Trước
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                // Chỉ hiển thị trang đầu, trang cuối, và 2 trang xung quanh trang hiện tại
+                                if (i == 1 || i == Model.TotalPages || (i >= Model.PageIndex - 1 && i <= Model.PageIndex + 1))
+                                {
+                                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                        <a asp-action="Index"
+                                           asp-route-pageNumber="@i"
+                                           asp-route-searchString="@currentFilter"
+                                           class="page-link">@i</a>
+                                    </li>
+                                }
+                                else if (i == Model.PageIndex - 2 || i == Model.PageIndex + 2)
+                                {
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                }
+                            }
+
+                            <li class="page-item @nextDisabled">
+                                <a asp-action="Index"
+                                   asp-route-pageNumber="@(Model.PageIndex + 1)"
+                                   asp-route-searchString="@currentFilter"
+                                   class="page-link">
+                                    Sau <i class="fas fa-chevron-right ml-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content" style="border-radius: 12px;">
@@ -221,6 +295,7 @@
         </div>
     </div>
 </section>
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -245,13 +320,13 @@
         @if (TempData["SuccessMessage"] != null)
         {
             <text>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Thành công!',
-                        text: '@Html.Raw(TempData["SuccessMessage"])',
-                        timer: 2000, 
-                        showConfirmButton: false
-                    })
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: '@Html.Raw(TempData["SuccessMessage"])',
+                                timer: 2000,
+                                showConfirmButton: false
+                            })
             </text>
         }
 
@@ -263,11 +338,11 @@
         @if (TempData["ErrorMessage"] != null)
         {
             <text>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Lỗi!',
-                    text: '@Html.Raw(TempData["ErrorMessage"])'
-                });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: '@Html.Raw(TempData["ErrorMessage"])'
+                        });
             </text>
         }
     </script>

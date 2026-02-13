@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
+using ContactsManagement.Helpers;
 
 namespace ContactsManagement.Controllers
 {
@@ -14,13 +16,14 @@ namespace ContactsManagement.Controllers
 	public class ContactsController : Controller
 	{
 		private readonly AppDbContext _context;
+		private const int pageSize = 10;
 		public ContactsController(AppDbContext context)
 		{
 			_context = context;
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Index(string searchString)
+		public async Task<IActionResult> Index(string searchString, int pageNumber = 1)
 		{
 			// Lấy UserId từ Claims rồi ép kiểu về int
 			var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -29,8 +32,7 @@ namespace ContactsManagement.Controllers
 
 			var query = _context.Contacts
 				.AsNoTracking()
-				.Where(c => c.UserId == userId && c.IsDeleted == false)
-				.AsQueryable();
+				.Where(c => c.UserId == userId && c.IsDeleted == false);
 
 			if (!string.IsNullOrWhiteSpace(searchString))
 			{
@@ -39,21 +41,32 @@ namespace ContactsManagement.Controllers
 				query = query.Where(c => c.FullName.Contains(searchString)
 									  || c.PhoneNumber.Contains(searchString)
 									  || c.Email.Contains(searchString));
-			}	
+			}
 
-			var myContacts = await query.OrderByDescending(c => c.CreatedAt)
+			if (pageNumber < 1)
+			{
+				pageNumber = 1;
+			}
+
+			var contacts = query.OrderByDescending(c => c.CreatedAt)
 				.Select(c => new ContactDTO
-				{ 
+				{
 					ContactId = c.ContactId,
 					FullName = c.FullName,
 					PhoneNumber = c.PhoneNumber,
 					Email = c.Email,
 					CreatedAt = c.CreatedAt
-				})
-				.ToListAsync();
+				});
+
+			var paginatedContacts = await PaginatedList<ContactDTO>.CreateAsync(
+				contacts,
+				pageNumber,
+				pageSize
+			);
 
 			ViewData["CurrentFilter"] = searchString;
-			return View(myContacts);
+			ViewData["CurrentPage"] = pageNumber;
+			return View(paginatedContacts);
 		}
 
 		[HttpGet]

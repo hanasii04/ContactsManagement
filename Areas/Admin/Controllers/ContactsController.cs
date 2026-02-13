@@ -1,4 +1,5 @@
-﻿using ContactsManagement.Models;
+﻿using ContactsManagement.Helpers;
+using ContactsManagement.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,12 +11,13 @@ namespace ContactsManagement.Areas.Admin.Controllers
 	public class ContactsController : Controller
 	{
 		private readonly AppDbContext _context;
+		private const int PageSize = 10;
 		public ContactsController(AppDbContext context)
 		{
 			_context = context;
 		}
 		[HttpGet]
-		public async Task<IActionResult> Index(string searchString, int? userId)
+		public async Task<IActionResult> Index(string searchString, int? userId, int pageNumber = 1)
 		{
 			var query = _context.Contacts
 				.Include(c => c.Users)
@@ -30,17 +32,29 @@ namespace ContactsManagement.Areas.Admin.Controllers
 
 			if (!string.IsNullOrEmpty(searchString))
 			{
+				searchString = searchString.Trim();
 				query = query.Where(c => c.FullName.Contains(searchString)
 									  || c.PhoneNumber.Contains(searchString)
 									  || c.Users.Email.Contains(searchString));
 			}
+			if (pageNumber < 1)
+			{
+				pageNumber = 1;
+			}
 
-			var contacts = await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
+			var contacts = query.OrderByDescending(c => c.CreatedAt);
 
-			// Giữ lại giá trị tìm kiếm để hiển thị trong View
+			var paginatedContacts = await PaginatedList<Contacts>.CreateAsync(
+				contacts,
+				pageNumber,
+				PageSize
+			);
+
 			ViewData["CurrentFilter"] = searchString;
+			ViewData["CurrentUserId"] = userId; // Giữ lại userId để link chuyển trang k bị lỗi
+			ViewData["CurrentPage"] = pageNumber;
 
-			return View(contacts);
+			return View(paginatedContacts);
 		}
 
 		[HttpGet]

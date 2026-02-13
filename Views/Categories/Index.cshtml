@@ -1,89 +1,187 @@
-﻿@model IEnumerable<ContactsManagement.DTOs.Categories.CategoriesDTO>
+﻿@using ContactsManagement.Models
+@model ContactsManagement.Helpers.PaginatedList<ContactsManagement.DTOs.Categories.CategoriesDTO>
+
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentFilter = ViewData["CurrentFilter"] as string;
+
+    // Tính toán trạng thái nút phân trang
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
-<section class="content-header">
+<style>
+    /* Style riêng cho Avatar (Tông tím/xanh) - Đổi tên thành avatar-category cho chuẩn */
+    .avatar-category {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e8eaf6; /* Tím rất nhạt */
+        color: #3f51b5; /* Tím Indigo */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Hover vào dòng bảng */
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Gradient Button cho nút Thêm mới */
+    .btn-gradient-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
+    }
+
+        .btn-gradient-primary:hover {
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px rgba(0, 123, 255, 0.3);
+        }
+
+    /* Style cho phân trang */
+    .page-link {
+        color: #007bff;
+        border-radius: 6px !important;
+        margin: 0 2px;
+        border: none;
+        background-color: #f4f6f9;
+    }
+
+    .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,123,255,0.25);
+    }
+
+    .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #fff;
+        opacity: 0.6;
+    }
+</style>
+
+<div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Danh sách danh mục</h1>
+                <h1 class="m-0 text-dark" style="font-weight: 700;">Danh sách danh mục</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Index">Tổng quan</a></li>
                     <li class="breadcrumb-item active">Danh mục</li>
                 </ol>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <section class="content">
     <div class="container-fluid">
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <a asp-action="Create" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Thêm mới
-                </a>
 
-                <div class="card-tools">
-                    <form asp-action="Index" method="get">
-                        <div class="input-group input-group-sm" style="width: 250px;">
-                            <input type="text" name="searchString" class="form-control float-right"
-                                   placeholder="Tìm theo tên..." value="@ViewData["CurrentFilter"]">
+        <div class="card card-outline card-primary" style="border-radius: 12px; border-top-width: 3px;">
 
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-default">
-                                    <i class="fas fa-search"></i>
-                                </button>
+            <div class="card-header border-0 pt-3 pb-3">
+                <div class="row align-items-center">
+                    <div class="col-md-4 mb-2 mb-md-0">
+                        <a asp-action="Create" class="btn btn-gradient-primary px-4 py-2" style="border-radius: 8px; font-weight: 600;">
+                            <i class="fas fa-plus mr-2"></i> Thêm danh mục mới
+                        </a>
+                    </div>
+
+                    <div class="col-md-8">
+                        <form asp-action="Index" method="get">
+                            <div class="input-group" style="max-width: 400px; margin-left: auto;">
+                                <input type="text" name="searchString" class="form-control"
+                                       placeholder="Tìm theo tên danh mục..."
+                                       value="@currentFilter"
+                                       style="border-radius: 8px 0 0 8px; border-color: #dee2e6;">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default" style="border-radius: 0 8px 8px 0; border-color: #dee2e6;">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-            <div class="card-body table-responsive p-0">
-                <table class="table table-hover text-nowrap">
-                    <thead>
+
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover table-striped valign-middle">
+                    <thead style="background-color: #f4f6f9;">
                         <tr>
-                            <th>Tên danh mục</th>
-                            <th>Ngày tạo</th>
-                            <th>Ngày cập nhật</th>
-                            <th style="width: 150px;" class="text-center">Thao tác</th>
+                            <th style="width: 5%;" class="text-center">#</th>
+                            <th style="width: 30%;">Tên danh mục</th>
+                            <th style="width: 20%;">Ngày tạo</th>
+                            <th style="width: 25%;">Ngày cập nhật</th>
+                            <th style="width: 20%;" class="text-right pr-4">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model != null && Model.Any())
+                        @if (Model != null && Model.Items != null && Model.Items.Any())
                         {
-                            foreach (var item in Model)
+                            foreach (var item in Model.Items)
                             {
                                 <tr>
-                                    <td>
-                                        <span class="font-weight-bold text-primary">@item.Name</span>
+                                    <td class="text-center align-middle">
+                                        <div class="avatar-category mx-auto">
+                                            @(item.Name?.Substring(0, 1).ToUpper() ?? "?")
+                                        </div>
                                     </td>
-                                    <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td>
+                                    <td class="align-middle">
+                                        <a asp-action="Details" asp-route-id="@item.CategoriesId" class="font-weight-bold text-dark" style="font-size: 1rem;">
+                                            @item.Name
+                                        </a>
+                                    </td>
+                                    <td class="align-middle">
+                                        <small class="text-muted">
+                                            <i class="far fa-calendar-plus mr-1"></i> @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                    </td>
+                                    <td class="align-middle">
                                         @if (item.UpdatedAt.HasValue)
                                         {
-                                            @item.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                            <small class="text-muted">
+                                                <i class="far fa-edit mr-1"></i> @item.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                            </small>
                                         }
                                         else
                                         {
-                                            <span class="text-muted text-sm">Chưa cập nhật</span>
+                                            <span class="text-muted small font-italic">Chưa cập nhật</span>
                                         }
                                     </td>
-                                    <td class="text-center">
-                                        <div class="btn-group btn-group-sm">
-                                            <a asp-action="Details" asp-route-id="@item.CategoriesId" class="btn btn-info" title="Xem chi tiết">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a asp-action="Update" asp-route-id="@item.CategoriesId" class="btn btn-warning" title="Sửa">
-                                                <i class="fas fa-pen"></i>
-                                            </a>
-                                            <a asp-action="Delete" asp-route-id="@item.CategoriesId" class="btn btn-danger" title="Xóa">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
+                                    <td class="text-right align-middle pr-4">
+                                        <a asp-action="Details" asp-route-id="@item.CategoriesId"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Xem chi tiết" style="border-radius: 6px; margin-right: 5px;">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <a asp-action="Update" asp-route-id="@item.CategoriesId"
+                                           class="btn btn-sm btn-outline-info"
+                                           title="Chỉnh sửa" style="border-radius: 6px; margin-right: 5px;">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+                                        <form asp-action="Delete" asp-route-id="@item.CategoriesId" method="post"
+                                              id="delete-form-@item.CategoriesId" style="display: inline-block;">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="button" onclick="confirmDelete(@item.CategoriesId)"
+                                                    class="btn btn-sm btn-outline-danger" title="Xóa" style="border-radius: 6px;">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             }
@@ -91,15 +189,114 @@
                         else
                         {
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-4">
-                                    <i class="fas fa-folder-open fa-2x mb-2"></i><br />
-                                    Không tìm thấy dữ liệu nào.
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-folder-open fa-3x mb-3" style="opacity: 0.2;"></i>
+                                        <p class="mb-1">Không tìm thấy danh mục nào</p>
+                                    </div>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
+
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center py-3">
+
+                <div class="text-muted small">
+                    Hiển thị <b>@Model.Items.Count</b> trong tổng số <b>@Model.TotalCount</b> danh mục (Trang @Model.PageIndex / @Model.TotalPages)
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-sm m-0">
+                            <li class="page-item @prevDisabled">
+                                <a asp-action="Index"
+                                   asp-route-pageNumber="@(Model.PageIndex - 1)"
+                                   asp-route-searchString="@currentFilter"
+                                   class="page-link">
+                                    <i class="fas fa-chevron-left mr-1"></i> Trước
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                if (i == 1 || i == Model.TotalPages || (i >= Model.PageIndex - 1 && i <= Model.PageIndex + 1))
+                                {
+                                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                        <a asp-action="Index"
+                                           asp-route-pageNumber="@i"
+                                           asp-route-searchString="@currentFilter"
+                                           class="page-link">@i</a>
+                                    </li>
+                                }
+                                else if (i == Model.PageIndex - 2 || i == Model.PageIndex + 2)
+                                {
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                }
+                            }
+
+                            <li class="page-item @nextDisabled">
+                                <a asp-action="Index"
+                                   asp-route-pageNumber="@(Model.PageIndex + 1)"
+                                   asp-route-searchString="@currentFilter"
+                                   class="page-link">
+                                    Sau <i class="fas fa-chevron-right ml-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            </div>
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Hàm xử lý khi bấm nút xóa
+        function confirmDelete(categoryId) {
+            Swal.fire({
+                title: 'Xóa danh mục này',
+                text: 'Hành động này không thể hoàn tác!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy bỏ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + categoryId).submit();
+                }
+            })
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: '@Html.Raw(TempData["SuccessMessage"])',
+                        timer: 2000,
+                        showConfirmButton: false
+                    })
+            </text>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: '@Html.Raw(TempData["ErrorMessage"])'
+                    });
+            </text>
+        }
+    </script>
+}
