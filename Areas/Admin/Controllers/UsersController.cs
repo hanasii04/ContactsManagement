@@ -1,4 +1,5 @@
 ﻿using ContactsManagement.Areas.Admin.Models;
+using ContactsManagement.Helpers;
 using ContactsManagement.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +12,14 @@ namespace ContactsManagement.Areas.Admin.Controllers
 	public class UsersController : Controller
 	{
 		private readonly AppDbContext _context;
+		private const int PageSize = 10;
 		public UsersController(AppDbContext context)
 		{
 			_context = context;
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Index(string searchString)
+		public async Task<IActionResult> Index(string searchString, int pageNumber = 1)
 		{
 			var query = _context.Users
 				.AsNoTracking() // Tối ưu khi chỉ đọc dữ liệu, không cần theo dõi thay đổi
@@ -28,9 +30,14 @@ namespace ContactsManagement.Areas.Admin.Controllers
 			{
 				searchString = searchString.Trim();
 				query = query.Where(u => u.FullName.Contains(searchString) || u.Email.Contains(searchString));
-			}	
+			}
 
-			var listUsers = await query.OrderByDescending(u => u.CreatedAt)
+			if (pageNumber < 1)
+			{
+				pageNumber = 1;
+			}
+
+			var listUsers = query.OrderByDescending(u => u.CreatedAt)
 				.Select(u => new UserModel
 				{
 					UserId = u.UserId,
@@ -39,11 +46,18 @@ namespace ContactsManagement.Areas.Admin.Controllers
 					CreatedAt = u.CreatedAt,
 					IsActive = u.IsActive,
 					TotalContacts = u.Contacts.Count
-				})
-				.ToListAsync();
+				});
+
+			var paginatedUsers = await PaginatedList<UserModel>.CreateAsync(
+				listUsers,
+				pageNumber,
+				PageSize
+			);
 
 			ViewData["CurrentFilter"] = searchString;
-			return View(listUsers);
+			ViewData["CurrentPage"] = pageNumber;
+
+			return View(paginatedUsers);
 		}
 
 		[HttpGet]
